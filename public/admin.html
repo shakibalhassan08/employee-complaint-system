@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Complaints</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div class="dashboard">
+  <h1>🛠 Admin Complaint Dashboard</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>EMP ID</th>
+        <th>Problem</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="complaints"></tbody>
+  </table>
+</div>
+
+<script>
+async function loadComplaints() {
+  const res = await fetch("/api/complaints");
+  const data = await res.json();
+
+  const table = document.getElementById("complaints");
+  table.innerHTML = "";
+
+  data.forEach(c => {
+    table.innerHTML += `
+      <tr>
+        <td>${c.complaint_id}</td>
+        <td>${c.emp_id}</td>
+        <td>${c.problem}</td>
+        <td>${c.status}</td>
+        <td>${new Date(c.created_at).toLocaleString()}</td>
+        <td>
+          <select onchange="updateStatus(${c.complaint_id}, this.value)">
+            <option ${c.status==='Open'?'selected':''}>Open</option>
+            <option ${c.status==='In Progress'?'selected':''}>In Progress</option>
+            <option ${c.status==='Closed'?'selected':''}>Closed</option>
+          </select>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+async function updateStatus(id, status) {
+  await fetch(`/api/complaint/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status })
+  });
+  loadComplaints();
+}
+
+loadComplaints();
+setInterval(loadComplaints, 3000);
+</script>
+
+</body>
+</html>

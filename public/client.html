@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Employee Complaint</title>
+  <link rel="stylesheet" href="client.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2>📝 Submit Complaint</h2>
+
+    <form id="complaintForm">
+      <input type="text" id="emp_id" placeholder="Employee ID" required>
+      <textarea id="problem" placeholder="Describe your problem..." required></textarea>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+</div>
+
+<div id="message" class="success-msg">Complaint Submitted Successfully ✅</div>
+
+<script>
+const form = document.getElementById("complaintForm");
+const message = document.getElementById("message");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const emp_id = document.getElementById("emp_id").value;
+  const problem = document.getElementById("problem").value;
+
+  const res = await fetch("/api/complaint", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ emp_id, problem })
+  });
+
+  if (res.ok) {
+    message.classList.add("show");
+    form.reset();
+
+    setTimeout(() => {
+      message.classList.remove("show");
+    }, 3000);
+  }
+});
+</script>
+
+</body>
+</html>
