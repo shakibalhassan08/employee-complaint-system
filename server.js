@@ -1,5 +1,34 @@
 const express = require("express");
 const mysql = require("mysql2");
+const mysql = require("mysql2");
+
+const db = mysql.createPool({
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT
+});
+
+// CREATE TABLE ON SERVER START
+const createTableQuery = `
+CREATE TABLE IF NOT EXISTS complaints (
+  complaint_id INT AUTO_INCREMENT PRIMARY KEY,
+  emp_id VARCHAR(20),
+  problem TEXT,
+  status VARCHAR(20) DEFAULT 'Pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+`;
+
+db.query(createTableQuery, (err) => {
+  if (err) {
+    console.error("Table creation failed:", err);
+  } else {
+    console.log("✅ Complaints table ready");
+  }
+});
+
 const path = require("path");
 
 const app = express();
@@ -89,3 +118,4 @@ app.get("/admin", (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
