@@ -26,8 +26,10 @@
 </div>
 
 <script>
+const API_BASE = "https://employee-complaint-system-4.onrender.com";
+
 async function loadComplaints() {
-  const res = await fetch("/api/complaints");
+  const res = await fetch(`${API_BASE}/api/complaints`);
   const data = await res.json();
 
   const table = document.getElementById("complaints");
@@ -54,7 +56,7 @@ async function loadComplaints() {
 }
 
 async function updateStatus(id, status) {
-  await fetch(`/api/complaint/${id}`, {
+  await fetch(`${API_BASE}/api/complaint/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status })
