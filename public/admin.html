@@ -2,41 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Complaints</title>
-  <link rel="stylesheet" href="admin.css">
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f8;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 90%;
+      margin: auto;
+      border-collapse: collapse;
+      background: white;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    select {
+      padding: 5px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="dashboard">
-  <h1>🛠 Admin Complaint Dashboard</h1>
+<h1>🛠 Admin Complaint Dashboard</h1>
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>EMP ID</th>
-        <th>Problem</th>
-        <th>Status</th>
-        <th>Date</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="complaints"></tbody>
-  </table>
-</div>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>EMP ID</th>
+      <th>Problem</th>
+      <th>Status</th>
+      <th>Date</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="complaints"></tbody>
+</table>
 
 <script>
-const API_BASE = "https://employee-complaint-system-4.onrender.com";
+const API = "https://employee-complaint-system-4.onrender.com";
 
 async function loadComplaints() {
-  const res = await fetch(`${API_BASE}/api/complaints`);
+  const res = await fetch(`${API}/api/complaints`);
   const data = await res.json();
 
-  const table = document.getElementById("complaints");
-  table.innerHTML = "";
+  const tbody = document.getElementById("complaints");
+  tbody.innerHTML = "";
 
   data.forEach(c => {
-    table.innerHTML += `
+    tbody.innerHTML += `
       <tr>
         <td>${c.complaint_id}</td>
         <td>${c.emp_id}</td>
@@ -45,9 +65,9 @@ async function loadComplaints() {
         <td>${new Date(c.created_at).toLocaleString()}</td>
         <td>
           <select onchange="updateStatus(${c.complaint_id}, this.value)">
-            <option ${c.status==='Open'?'selected':''}>Open</option>
-            <option ${c.status==='In Progress'?'selected':''}>In Progress</option>
-            <option ${c.status==='Closed'?'selected':''}>Closed</option>
+            <option ${c.status === 'Open' ? 'selected' : ''}>Open</option>
+            <option ${c.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+            <option ${c.status === 'Closed' ? 'selected' : ''}>Closed</option>
           </select>
         </td>
       </tr>
@@ -56,16 +76,15 @@ async function loadComplaints() {
 }
 
 async function updateStatus(id, status) {
-  await fetch(`${API_BASE}/api/complaint/${id}`, {
+  await fetch(`${API}/api/complaint/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status })
   });
-  loadComplaints();
 }
 
 loadComplaints();
-setInterval(loadComplaints, 3000);
+setInterval(loadComplaints, 5000);
 </script>
 
 </body>
