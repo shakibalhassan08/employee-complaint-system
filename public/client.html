@@ -1,86 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Employee Complaint</title>
-  <style>
-    body {
-      font-family: Arial;
-      background: #f4f6f8;
-    }
-    .card {
-      width: 350px;
-      margin: 80px auto;
-      padding: 20px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input, textarea, button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .success {
-      display: none;
-      color: green;
-      margin-top: 10px;
-      text-align: center;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Employee Complaint</title>
+<link rel="stylesheet" href="client.css">
 </head>
 <body>
 
-<div class="card">
-  <h2>📝 Submit Complaint</h2>
+<div class="container fade-in">
+  <h2>📝 Employee Complaint</h2>
 
-  <input type="text" id="emp_id" placeholder="Employee ID" required>
-  <textarea id="problem" placeholder="Describe your problem" required></textarea>
-  <button onclick="submitComplaint()">Submit</button>
+  <form id="complaintForm">
+    <input type="text" id="emp_id" placeholder="Employee ID" required>
+    <textarea id="problem" placeholder="Describe your problem..." required></textarea>
+    <button type="submit">Submit Complaint</button>
+  </form>
 
-  <div class="success" id="successMsg">
-    ✅ Complaint submitted successfully
-  </div>
+  <p id="msg" class="success"></p>
 </div>
 
 <script>
-async function submitComplaint() {
+const API_URL = "https://employee-complaint-system-4.onrender.com";
+
+document.getElementById("complaintForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
   const emp_id = document.getElementById("emp_id").value.trim();
   const problem = document.getElementById("problem").value.trim();
-  const successMsg = document.getElementById("successMsg");
+  const msg = document.getElementById("msg");
 
-  if (!emp_id || !problem) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  const res = await fetch(
-    "https://employee-complaint-system-4.onrender.com/api/complaint",
-    {
+  try {
+    const res = await fetch(`${API_URL}/api/complaint`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ emp_id, problem })
-    }
-  );
+    });
 
-  if (res.ok) {
-    successMsg.style.display = "block";
-    document.getElementById("emp_id").value = "";
-    document.getElementById("problem").value = "";
+    if (!res.ok) throw new Error();
 
-    setTimeout(() => {
-      successMsg.style.display = "none";
-    }, 3000);
-  } else {
-    alert("❌ Failed to submit complaint");
+    msg.textContent = "✅ Complaint submitted successfully!";
+    msg.style.display = "block";
+    e.target.reset();
+  } catch {
+    msg.textContent = "❌ Failed to submit complaint";
+    msg.style.display = "block";
   }
-}
+});
 </script>
 
 </body>
