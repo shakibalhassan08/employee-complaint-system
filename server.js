@@ -1,54 +1,64 @@
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
+const path = require("path");
+require("dotenv").config();
 
 const app = express();
 
-/* =====================
+/* =========================
    MIDDLEWARE
-===================== */
+========================= */
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* =====================
-   DATABASE CONNECTION
-===================== */
+/* =========================
+   STATIC FILES
+   public/client.html
+   public/admin.html
+========================= */
+app.use(express.static(path.join(__dirname, "public")));
+
+/* =========================
+   MYSQL CONNECTION
+========================= */
 const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 3306,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
 db.getConnection((err, connection) => {
   if (err) {
-    console.error("❌ MySQL connection failed:", err);
+    console.error("❌ MySQL connection failed:", err.message);
   } else {
-    console.log("✅ MySQL connected");
+    console.log("✅ MySQL Connected");
     connection.release();
   }
 });
 
-/* =====================
+/* =========================
    ROUTES
-===================== */
+========================= */
 
-/* Test route */
+// Health check
 app.get("/", (req, res) => {
   res.send("Employee Complaint System API is running 🚀");
 });
 
-/* CLIENT: Raise complaint */
+/* ---------- CLIENT ---------- */
+// Raise a complaint
 app.post("/api/complaints", (req, res) => {
   const { emp_id, problem } = req.body;
 
   if (!emp_id || !problem) {
-    return res.status(400).json({ message: "emp_id and problem are required" });
+    return res.status(400).json({ message: "All fields are required" });
   }
 
   const sql =
@@ -63,26 +73,25 @@ app.post("/api/complaints", (req, res) => {
   });
 });
 
-/* ADMIN: Get all complaints */
-app.get("/api/admin/complaints", (req, res) => {
+/* ---------- ADMIN ---------- */
+// View all complaints
+app.get("/api/complaints", (req, res) => {
   const sql = "SELECT * FROM complaints ORDER BY created_at DESC";
-
-  db.query(sql, (err, rows) => {
+  db.query(sql, (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: "Database error" });
     }
-    res.json(rows);
+    res.json(results);
   });
 });
 
-/* ADMIN: Update complaint status */
-app.put("/api/admin/complaints/:id", (req, res) => {
-  const { status } = req.body;
+// Update complaint status
+app.put("/api/complaints/:id", (req, res) => {
   const { id } = req.params;
+  const { status } = req.body;
 
   const sql = "UPDATE complaints SET status=? WHERE complaint_id=?";
-
   db.query(sql, [status, id], (err) => {
     if (err) {
       console.error(err);
@@ -92,12 +101,21 @@ app.put("/api/admin/complaints/:id", (req, res) => {
   });
 });
 
-/* =====================
-   START SERVER
-===================== */
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+/* =========================
+   PAGE ROUTES
+========================= */
+app.get("/client", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "client.html"));
 });
 
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "admin.html"));
+});
+
+/* =========================
+   START SERVER
+========================= */
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
