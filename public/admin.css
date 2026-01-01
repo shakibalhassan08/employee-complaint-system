@@ -1,50 +1,23 @@
 body {
-  background: #0b0f19;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  padding: 20px;
-}
-
-h1 {
-  color: #00e6e6;
-  text-align: center;
-  animation: fadeIn 1s ease;
-}
-
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
+  background:#0f172a;
+  color:white;
+  font-family:Arial;
+  padding:40px;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  animation: slide 0.8s ease;
-}
-
-@keyframes slide {
-  from {transform: translateY(30px); opacity: 0;}
-  to {transform: translateY(0); opacity: 1;}
+  width:100%;
+  background:#1e293b;
+  border-radius:10px;
+  animation: slide 0.8s;
 }
 
 th, td {
-  padding: 12px;
-  border-bottom: 1px solid #333;
+  padding:12px;
+  border-bottom:1px solid #334155;
 }
 
-th {
-  background: #111;
-}
-
-tr:hover {
-  background: #1a1a1a;
-}
-
-select {
-  background: #222;
-  color: white;
-  border: none;
-  padding: 5px;
-  border-radius: 4px;
+@keyframes slide {
+  from {opacity:0; transform:translateY(20px);}
+  to {opacity:1;}
 }
