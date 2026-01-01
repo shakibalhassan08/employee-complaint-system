@@ -1,23 +1,30 @@
 body {
-  background:#0f172a;
-  color:white;
-  font-family:Arial;
-  padding:40px;
+  background: #0f172a;
+  color: white;
+  font-family: Arial;
+  padding: 30px;
+}
+
+h1 {
+  margin-bottom: 20px;
 }
 
 table {
-  width:100%;
-  background:#1e293b;
-  border-radius:10px;
-  animation: slide 0.8s;
+  width: 100%;
+  border-collapse: collapse;
+  animation: fade 0.8s ease;
 }
 
 th, td {
-  padding:12px;
-  border-bottom:1px solid #334155;
+  padding: 12px;
+  border-bottom: 1px solid #334155;
 }
 
-@keyframes slide {
-  from {opacity:0; transform:translateY(20px);}
-  to {opacity:1;}
+tr:hover {
+  background: #1e293b;
+}
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
