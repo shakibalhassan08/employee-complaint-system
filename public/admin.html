@@ -5,45 +5,30 @@
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-
-<h1>🛠 Admin Dashboard</h1>
-
-<table>
-  <thead>
-    <tr><th>ID</th><th>Emp</th><th>Problem</th><th>Status</th></tr>
-  </thead>
-  <tbody id="data"></tbody>
-</table>
+  <h1>⚙ Admin Dashboard</h1>
+  <table id="table">
+    <tr>
+      <th>ID</th>
+      <th>Employee</th>
+      <th>Problem</th>
+      <th>Status</th>
+    </tr>
+  </table>
 
 <script>
-async function load() {
-  const res = await fetch("/api/complaints");
-  const data = await res.json();
-
-  dataEl.innerHTML = data.map(c => `
-    <tr>
-      <td>${c.complaint_id}</td>
-      <td>${c.emp_id}</td>
-      <td>${c.problem}</td>
-      <td>
-        <select onchange="update(${c.complaint_id},this.value)">
-          <option ${c.status=="Open"?"selected":""}>Open</option>
-          <option ${c.status=="Closed"?"selected":""}>Closed</option>
-        </select>
-      </td>
-    </tr>`).join("");
-}
-
-function update(id,status){
-  fetch("/api/complaint/"+id,{
-    method:"PUT",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({status})
-  }).then(load);
-}
-
-load();
+fetch("/complaints")
+  .then(res => res.json())
+  .then(data => {
+    data.forEach(c => {
+      table.innerHTML += `
+        <tr>
+          <td>${c.id}</td>
+          <td>${c.emp_id}</td>
+          <td>${c.problem}</td>
+          <td>${c.status}</td>
+        </tr>`;
+    });
+  });
 </script>
-
 </body>
 </html>
