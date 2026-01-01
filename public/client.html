@@ -5,31 +5,31 @@
   <link rel="stylesheet" href="client.css">
 </head>
 <body>
+  <div class="card">
+    <h2>📝 Employee Complaint</h2>
 
-<div class="card">
-  <h2>📝 Employee Complaint</h2>
-  <input id="emp" placeholder="Employee ID">
-  <textarea id="problem" placeholder="Describe your issue"></textarea>
-  <button onclick="submitComplaint()">Submit</button>
-  <p id="msg"></p>
-</div>
+    <input id="emp" placeholder="Employee ID">
+    <textarea id="problem" placeholder="Describe your issue"></textarea>
+
+    <button onclick="submitComplaint()">Submit</button>
+    <p id="msg"></p>
+  </div>
 
 <script>
-async function submitComplaint() {
-  const emp_id = emp.value;
-  const problem = problem.value;
-
-  const res = await fetch("/api/complaint", {
+function submitComplaint() {
+  fetch("/submit", {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ emp_id, problem })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      emp_id: emp.value,
+      problem: problem.value
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    msg.innerText = data.success ? "✅ Submitted Successfully" : "❌ DB Error";
   });
-
-  msg.innerText = res.ok
-    ? "✅ Complaint Submitted"
-    : "❌ DB Error";
 }
 </script>
-
 </body>
 </html>
