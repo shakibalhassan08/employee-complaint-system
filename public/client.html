@@ -1,29 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Employee Complaint</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="client.css">
 </head>
 <body>
 
-<div class="card">
-  <h2>📝 Employee Complaint</h2>
+<div class="container">
+  <div class="card">
+    <h2>📝 Submit Complaint</h2>
 
-  <input id="emp_id" placeholder="Employee ID">
-  <textarea id="problem" placeholder="Describe your issue"></textarea>
-  <button onclick="submitComplaint()">Submit</button>
+    <form id="complaintForm">
+      <input type="text" id="emp_id" placeholder="Employee ID" required />
+      <textarea id="problem" placeholder="Describe your problem..." required></textarea>
+      <button type="submit">Submit</button>
+    </form>
 
-  <p id="msg"></p>
+    <p id="msg"></p>
+  </div>
 </div>
 
 <script>
-const API = "https://employee-complaint-system-4.onrender.com";
+document.getElementById("complaintForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-async function submitComplaint() {
   const emp_id = document.getElementById("emp_id").value;
   const problem = document.getElementById("problem").value;
 
-  const res = await fetch(API + "/api/complaint", {
+  const res = await fetch("/api/complaint", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ emp_id, problem })
@@ -32,13 +37,14 @@ async function submitComplaint() {
   const msg = document.getElementById("msg");
 
   if (res.ok) {
-    msg.innerHTML = "✅ Complaint Submitted!";
-    msg.className = "success";
+    msg.textContent = "✅ Complaint submitted successfully!";
+    msg.style.color = "green";
+    e.target.reset();
   } else {
-    msg.innerHTML = "❌ Submission Failed";
-    msg.className = "error";
+    msg.textContent = "❌ Failed to submit complaint";
+    msg.style.color = "red";
   }
-}
+});
 </script>
 
 </body>
