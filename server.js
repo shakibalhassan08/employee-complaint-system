@@ -15,18 +15,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "client.html"));
 });
 
-const express = require("express");
-const mysql = require("mysql2");
-const cors = require("cors");
-const path = require("path");
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// ✅ SERVE STATIC FILES
-app.use(express.static(path.join(__dirname, "public")));
-
 // ✅ MYSQL CONNECTION
 const db = mysql.createPool({
   host: process.env.DB_HOST,
@@ -83,4 +71,5 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
+
 
