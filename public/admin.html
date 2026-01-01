@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="admin.css">
 </head>
@@ -11,14 +10,9 @@
 
 <table>
   <thead>
-    <tr>
-      <th>ID</th>
-      <th>Employee</th>
-      <th>Problem</th>
-      <th>Status</th>
-    </tr>
+    <tr><th>ID</th><th>Emp</th><th>Problem</th><th>Status</th></tr>
   </thead>
-  <tbody id="rows"></tbody>
+  <tbody id="data"></tbody>
 </table>
 
 <script>
@@ -26,36 +20,29 @@ async function load() {
   const res = await fetch("/api/complaints");
   const data = await res.json();
 
-  const rows = document.getElementById("rows");
-  rows.innerHTML = "";
-
-  data.forEach(c => {
-    rows.innerHTML += `
-      <tr>
-        <td>${c.complaint_id}</td>
-        <td>${c.emp_id}</td>
-        <td>${c.problem}</td>
-        <td>
-          <select onchange="update(${c.complaint_id}, this.value)">
-            <option ${c.status==='Open'?'selected':''}>Open</option>
-            <option ${c.status==='In Progress'?'selected':''}>In Progress</option>
-            <option ${c.status==='Closed'?'selected':''}>Closed</option>
-          </select>
-        </td>
-      </tr>`;
-  });
+  dataEl.innerHTML = data.map(c => `
+    <tr>
+      <td>${c.complaint_id}</td>
+      <td>${c.emp_id}</td>
+      <td>${c.problem}</td>
+      <td>
+        <select onchange="update(${c.complaint_id},this.value)">
+          <option ${c.status=="Open"?"selected":""}>Open</option>
+          <option ${c.status=="Closed"?"selected":""}>Closed</option>
+        </select>
+      </td>
+    </tr>`).join("");
 }
 
-async function update(id, status) {
-  await fetch(`/api/complaint/${id}`, {
-    method: "PUT",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({status})
-  });
+function update(id,status){
+  fetch("/api/complaint/"+id,{
+    method:"PUT",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({status})
+  }).then(load);
 }
 
 load();
-setInterval(load, 4000);
 </script>
 
 </body>
