@@ -1,91 +1,92 @@
+require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql2");
 const path = require("path");
+const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-/* Middleware */
+/* ---------- MIDDLEWARE ---------- */
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
 
-/* MySQL Connection */
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 3306
+/* ---------- STATIC FILES ---------- */
+app.use(express.static(path.join(__dirname, "public")));
+
+/* ---------- MYSQL CONNECTION (AIVEN) ---------- */
+const db = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  port: process.env.MYSQL_PORT,
+  ssl: process.env.MYSQL_SSL === "true" ? { rejectUnauthorized: false } : false
 });
 
-db.connect(err => {
+db.getConnection((err) => {
   if (err) {
-    console.error("❌ MySQL Error:", err.message);
+    console.error("❌ MySQL connection failed:", err.message);
   } else {
-    console.log("✅ MySQL Connected");
+    console.log("✅ MySQL connected successfully");
   }
 });
 
-/* ROUTES */
+/* ---------- CREATE TABLE ---------- */
+db.query(`
+CREATE TABLE IF NOT EXISTS complaints (
+  complaint_id INT AUTO_INCREMENT PRIMARY KEY,
+  emp_id VARCHAR(50),
+  problem TEXT,
+  status VARCHAR(30) DEFAULT 'Open',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)`);
 
-/* Home check */
-app.get("/", (req, res) => {
-  res.send("Employee Complaint System API is running 🚀");
-});
+/* ---------- ROUTES ---------- */
 
-/* Serve pages */
-app.get("/client", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/client.html"));
-});
-
-app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/admin.html"));
-});
-
-/* APIs */
-
-/* Create complaint */
+// client submit complaint
 app.post("/api/complaint", (req, res) => {
   const { emp_id, problem } = req.body;
-
   if (!emp_id || !problem) {
-    return res.status(400).json({ message: "Missing data" });
+    return res.status(400).json({ message: "Missing fields" });
   }
 
-  const sql =
-    "INSERT INTO complaints (emp_id, problem, status) VALUES (?, ?, 'Open')";
-
-  db.query(sql, [emp_id, problem], err => {
-    if (err) {
-      return res.status(500).json({ message: "DB error" });
+  db.query(
+    "INSERT INTO complaints (emp_id, problem) VALUES (?, ?)",
+    [emp_id, problem],
+    (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ message: "Complaint submitted" });
     }
-    res.json({ message: "Complaint submitted successfully" });
-  });
+  );
 });
 
-/* Get all complaints */
+// admin fetch complaints
 app.get("/api/complaints", (req, res) => {
-  db.query("SELECT * FROM complaints ORDER BY created_at DESC", (err, rows) => {
-    if (err) return res.status(500).json([]);
-    res.json(rows);
-  });
+  db.query(
+    "SELECT * FROM complaints ORDER BY created_at DESC",
+    (err, rows) => {
+      if (err) return res.status(500).json(err);
+      res.json(rows);
+    }
+  );
 });
 
-/* Update status */
+// admin update status
 app.put("/api/complaint/:id", (req, res) => {
   const { status } = req.body;
   db.query(
     "UPDATE complaints SET status=? WHERE complaint_id=?",
     [status, req.params.id],
-    err => {
-      if (err) return res.status(500).json({ message: "Update failed" });
-      res.json({ message: "Updated" });
+    (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ message: "Status updated" });
     }
   );
 });
 
-/* Start server */
+/* ---------- START SERVER ---------- */
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
