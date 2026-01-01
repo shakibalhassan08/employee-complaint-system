@@ -12,33 +12,41 @@
   <thead>
     <tr>
       <th>ID</th>
-      <th>EMP ID</th>
+      <th>Emp</th>
       <th>Problem</th>
       <th>Status</th>
     </tr>
   </thead>
-  <tbody id="list"></tbody>
+  <tbody id="data"></tbody>
 </table>
 
 <script>
 async function load() {
   const res = await fetch("/api/complaints");
-  const data = await res.json();
+  const list = await res.json();
 
-  const tbody = document.getElementById("list");
-  tbody.innerHTML = "";
-
-  data.forEach(c => {
-    tbody.innerHTML += `
+  data.innerHTML = "";
+  list.forEach(c => {
+    data.innerHTML += `
       <tr>
-       <td data-label="ID">${c.complaint_id}</td>
-<td data-label="EMP ID">${c.emp_id}</td>
-<td data-label="Problem">${c.problem}</td>
-<td data-label="Status">${c.status}</td>
-<td data-label="Date">${new Date(c.created_at).toLocaleString()}</td>
-<td data-label="Action">...</td>
-
+        <td>${c.complaint_id}</td>
+        <td>${c.emp_id}</td>
+        <td>${c.problem}</td>
+        <td>
+          <select onchange="update(${c.complaint_id}, this.value)">
+            <option ${c.status=="Open"?"selected":""}>Open</option>
+            <option ${c.status=="Closed"?"selected":""}>Closed</option>
+          </select>
+        </td>
       </tr>`;
+  });
+}
+
+async function update(id, status) {
+  await fetch("/api/complaint/" + id, {
+    method: "PUT",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ status })
   });
 }
 
@@ -48,4 +56,3 @@ setInterval(load, 3000);
 
 </body>
 </html>
-
