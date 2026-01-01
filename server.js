@@ -4,6 +4,7 @@ const mysql = require("mysql2");
 const path = require("path");
 const cors = require("cors");
 
+
 const app = express();
 
 /* ---------- MIDDLEWARE ---------- */
@@ -12,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* ---------- STATIC FILES ---------- */
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("public"));
 
 /* ---------- MYSQL CONNECTION (AIVEN) ---------- */
 const db = mysql.createPool({
@@ -90,3 +91,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
