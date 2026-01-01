@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>Employee Complaint</title>
   <link rel="stylesheet" href="client.css">
 </head>
@@ -9,46 +8,27 @@
 
 <div class="card">
   <h2>📝 Employee Complaint</h2>
-
-  <form id="complaintForm">
-    <input type="text" id="emp_id" placeholder="Employee ID" required>
-    <textarea id="problem" placeholder="Describe your issue..." required></textarea>
-    <button type="submit">Submit Complaint</button>
-  </form>
-
+  <input id="emp" placeholder="Employee ID">
+  <textarea id="problem" placeholder="Describe your issue"></textarea>
+  <button onclick="submitComplaint()">Submit</button>
   <p id="msg"></p>
 </div>
 
 <script>
-const form = document.getElementById("complaintForm");
-const msg = document.getElementById("msg");
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  msg.textContent = "Submitting...";
-  msg.className = "info";
+async function submitComplaint() {
+  const emp_id = emp.value;
+  const problem = problem.value;
 
   const res = await fetch("/api/complaint", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      emp_id: emp_id.value,
-      problem: problem.value
-    })
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ emp_id, problem })
   });
 
-  const data = await res.json();
-
-  if (res.ok) {
-    msg.textContent = "✅ Complaint submitted successfully";
-    msg.className = "success";
-    form.reset();
-  } else {
-    msg.textContent = data.error || "❌ DB error";
-    msg.className = "error";
-  }
-});
+  msg.innerText = res.ok
+    ? "✅ Complaint Submitted"
+    : "❌ DB Error";
+}
 </script>
 
 </body>
