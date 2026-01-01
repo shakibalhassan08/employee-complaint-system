@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
@@ -11,28 +11,32 @@
 <table>
   <thead>
     <tr>
-      <th>ID</th><th>EMP</th><th>Problem</th><th>Status</th>
+      <th>ID</th>
+      <th>EMP ID</th>
+      <th>Problem</th>
+      <th>Status</th>
     </tr>
   </thead>
   <tbody id="list"></tbody>
 </table>
 
 <script>
-const API = "https://employee-complaint-system-4.onrender.com";
-
 async function load() {
-  const res = await fetch(API + "/api/complaints");
+  const res = await fetch("/api/complaints");
   const data = await res.json();
 
-  document.getElementById("list").innerHTML =
-    data.map(c => `
+  const tbody = document.getElementById("list");
+  tbody.innerHTML = "";
+
+  data.forEach(c => {
+    tbody.innerHTML += `
       <tr>
         <td>${c.complaint_id}</td>
         <td>${c.emp_id}</td>
         <td>${c.problem}</td>
         <td>${c.status}</td>
-      </tr>
-    `).join("");
+      </tr>`;
+  });
 }
 
 load();
