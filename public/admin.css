@@ -1,35 +1,50 @@
 body {
-  font-family: Arial;
-  background: #f4f6f8;
-  padding: 30px;
+  background: #0b0f19;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  padding: 20px;
 }
 
 h1 {
-  animation: fade 0.8s;
+  color: #00e6e6;
+  text-align: center;
+  animation: fadeIn 1s ease;
 }
 
-@keyframes fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
 }
 
 table {
   width: 100%;
-  background: white;
   border-collapse: collapse;
-  animation: slide 0.5s;
+  margin-top: 20px;
+  animation: slide 0.8s ease;
 }
 
 @keyframes slide {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {transform: translateY(30px); opacity: 0;}
+  to {transform: translateY(0); opacity: 1;}
 }
 
 th, td {
   padding: 12px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #333;
+}
+
+th {
+  background: #111;
+}
+
+tr:hover {
+  background: #1a1a1a;
 }
 
 select {
+  background: #222;
+  color: white;
+  border: none;
   padding: 5px;
+  border-radius: 4px;
 }
